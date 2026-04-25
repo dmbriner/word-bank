@@ -1,179 +1,12 @@
-const wordForm = document.querySelector("#word-form");
-const wordInput = document.querySelector("#word");
 const wordList = document.querySelector("#word-list");
 const searchInput = document.querySelector("#search-input");
 const filterButtons = document.querySelectorAll(".filter-button");
-const clearWordsButton = document.querySelector("#clear-words");
 const wordCount = document.querySelector("#word-count");
 const sourceCount = document.querySelector("#source-count");
-const saveStatus = document.querySelector("#save-status");
 const wordTemplate = document.querySelector("#word-card-template");
 
-const storageKey = "word-bank.words";
-const legacyProseKey = "word-bank.prose";
+let words = [];
 let activeFilter = "all";
-let pendingSource = readCaptureSource();
-
-const sampleWords = [
-  {
-    id: crypto.randomUUID(),
-    word: "ingratiating",
-    partOfSpeech: "adjective",
-    definition: "Intended to gain approval or favor; sycophantic.",
-    example: "",
-    sources: [],
-    createdAt: Date.now(),
-  },
-  {
-    id: crypto.randomUUID(),
-    word: "obsequious",
-    partOfSpeech: "adjective",
-    definition: "Obedient or attentive to an excessive or servile degree.",
-    example: "",
-    sources: [],
-    createdAt: Date.now() - 1,
-  },
-];
-
-let words = loadWords();
-
-function loadWords() {
-  const stored = localStorage.getItem(storageKey);
-  if (!stored) {
-    return sampleWords;
-  }
-
-  return JSON.parse(stored).map((entry) => ({
-    ...entry,
-    example: entry.example || "",
-    sources: normalizeSources(entry),
-    partOfSpeech: normalizePartOfSpeech(entry.partOfSpeech),
-  }));
-}
-
-function normalizeSources(entry) {
-  if (Array.isArray(entry.sources)) {
-    return entry.sources;
-  }
-
-  const legacyTitle = entry.bookTitle || entry.learnedAt || "";
-  if (!legacyTitle) {
-    return [];
-  }
-
-  return [
-    {
-      title: legacyTitle,
-      url: "",
-      app: "",
-      savedAt: entry.createdAt || Date.now(),
-    },
-  ];
-}
-
-function save() {
-  localStorage.setItem(storageKey, JSON.stringify(words));
-  localStorage.removeItem(legacyProseKey);
-}
-
-function readCaptureSource() {
-  const params = new URLSearchParams(window.location.search);
-  const source = {
-    title: params.get("sourceTitle") || params.get("title") || "",
-    url: params.get("sourceUrl") || params.get("url") || "",
-    app: params.get("app") || "",
-    savedAt: Date.now(),
-  };
-
-  return source.title || source.url || source.app ? source : null;
-}
-
-function readCapturedWord() {
-  const params = new URLSearchParams(window.location.search);
-  return cleanWord(params.get("word") || params.get("text") || params.get("selection") || "");
-}
-
-function cleanWord(value) {
-  return value
-    .trim()
-    .replace(/^[^\w'-]+|[^\w'-]+$/g, "")
-    .replace(/\s+/g, " ");
-}
-
-async function lookupWord(word) {
-  try {
-    const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
-    if (!response.ok) {
-      throw new Error("No definition found");
-    }
-
-    const [entry] = await response.json();
-    const meaning = entry.meanings?.find((item) => item.definitions?.[0]?.definition) || entry.meanings?.[0];
-    const definition = meaning?.definitions?.[0]?.definition || "Definition not found automatically.";
-    const example = meaning?.definitions?.[0]?.example || "";
-
-    return {
-      partOfSpeech: normalizePartOfSpeech(meaning?.partOfSpeech),
-      definition,
-      example,
-    };
-  } catch (error) {
-    return {
-      partOfSpeech: "other",
-      definition: "Definition not found automatically.",
-      example: "",
-    };
-  }
-}
-
-function normalizePartOfSpeech(partOfSpeech) {
-  return ["noun", "verb", "adjective", "adverb"].includes(partOfSpeech) ? partOfSpeech : "other";
-}
-
-async function saveWord(rawWord, source = null) {
-  const word = cleanWord(rawWord);
-  if (!word) {
-    return;
-  }
-
-  setStatus("Saving...");
-  const lookup = await lookupWord(word);
-  const existing = words.find((entry) => entry.word.toLowerCase() === word.toLowerCase());
-
-  if (existing) {
-    Object.assign(existing, {
-      ...lookup,
-      sources: addSource(existing.sources, source),
-      updatedAt: Date.now(),
-    });
-    setStatus(`Updated ${word}.`);
-  } else {
-    words.push({
-      id: crypto.randomUUID(),
-      word,
-      ...lookup,
-      sources: addSource([], source),
-      createdAt: Date.now(),
-    });
-    setStatus(`Saved ${word}.`);
-  }
-
-  save();
-  renderWords();
-}
-
-function addSource(sources, source) {
-  if (!source || (!source.title && !source.url && !source.app)) {
-    return sources;
-  }
-
-  const alreadySaved = sources.some((item) => item.title === source.title && item.url === source.url && item.app === source.app);
-  return alreadySaved ? sources : [...sources, source];
-}
-
-function setStatus(message) {
-  saveStatus.textContent = message;
-}
 
 function normalize(value) {
   return value.toLowerCase().trim();
@@ -217,7 +50,7 @@ function renderWords() {
   wordList.textContent = "";
 
   if (!visibleWords.length) {
-    wordList.append(emptyState("No saved words match this search."));
+    wordList.append(emptyState(words.length ? "No saved words match this search." : "No words have been published yet."));
     updateCounts();
     return;
   }
@@ -252,14 +85,13 @@ function wordCard(entry) {
   card.querySelector(".part").textContent = entry.partOfSpeech;
   card.querySelector(".definition").textContent = entry.definition;
   card.querySelector(".example").textContent = entry.example ? `Example: ${entry.example}` : "";
-  card.querySelector("footer").replaceChildren(...sourceNodes(entry.sources));
-  card.querySelector(".delete-word").addEventListener("click", () => deleteWord(entry.id));
+  card.querySelector("footer").replaceChildren(...sourceNodes(entry.sources || []));
   return card;
 }
 
 function sourceNodes(sources) {
   if (!sources.length) {
-    return [document.createTextNode("Saved manually")];
+    return [document.createTextNode("Saved by Dana")];
   }
 
   return sources.flatMap((source, index) => {
@@ -288,21 +120,25 @@ function emptyState(message) {
 
 function updateCounts() {
   wordCount.textContent = words.length;
-  sourceCount.textContent = new Set(words.flatMap((entry) => entry.sources.map((source) => source.title || source.url || source.app))).size;
+  sourceCount.textContent = new Set(words.flatMap((entry) => (entry.sources || []).map((source) => source.title || source.url || source.app))).size;
 }
 
-function deleteWord(id) {
-  words = words.filter((entry) => entry.id !== id);
-  save();
+async function loadPublishedWords() {
+  try {
+    const response = await fetch("data/words.json", { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error("Could not load published words");
+    }
+
+    const data = await response.json();
+    words = Array.isArray(data.words) ? data.words : [];
+  } catch (error) {
+    words = [];
+    wordList.append(emptyState("The published dictionary could not be loaded."));
+  }
+
   renderWords();
 }
-
-wordForm.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  await saveWord(wordInput.value, pendingSource);
-  pendingSource = null;
-  wordForm.reset();
-});
 
 filterButtons.forEach((button) => {
   button.addEventListener("click", () => {
@@ -315,24 +151,4 @@ filterButtons.forEach((button) => {
 
 searchInput.addEventListener("input", renderWords);
 
-clearWordsButton.addEventListener("click", () => {
-  words = [];
-  save();
-  renderWords();
-  setStatus("");
-});
-
-async function saveCapturedWord() {
-  const capturedWord = readCapturedWord();
-  if (!capturedWord) {
-    return;
-  }
-
-  wordInput.value = capturedWord;
-  await saveWord(capturedWord, pendingSource);
-  pendingSource = null;
-  window.history.replaceState({}, document.title, window.location.pathname);
-}
-
-renderWords();
-saveCapturedWord();
+loadPublishedWords();
