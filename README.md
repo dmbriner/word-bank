@@ -24,7 +24,33 @@ Optionally include source metadata:
 node tools/add-word.mjs obsequious --source-title "Trillion Dollar Triage" --app Kindle
 ```
 
+For a book source, include the author and optional location:
+
+```bash
+node tools/add-word.mjs sacrosanct --source-title "More Money than God" --author "Sebastian Mallaby" --location "chapter 2" --app Kindle
+```
+
 The script fills in the definition and grammar category automatically, then updates `data/words.json`. Commit and deploy the changed data file to publish the word.
+
+## Add Favorite Prose
+
+```bash
+node tools/add-prose.mjs "Ambiguity has its uses" --source-title "Trillion Dollar Triage" --author "Nick Timiraos"
+```
+
+This updates `data/prose.json`, which feeds the public Favorite Phrasings section.
+
+## Private Chrome Extension
+
+This repo includes an unpacked Chrome extension in `extension/`. Load it from `chrome://extensions` with Developer Mode on, then open the extension options and add a fine-grained GitHub token that can read/write repository contents for `dmbriner/word-bank`.
+
+Once configured, you can:
+
+- Select a word in Chrome and right-click “Save to Dana's Word Bank.”
+- Use the extension popup for quick manual saves.
+- Use the extension options page to add book metadata or bulk upload a word list.
+
+This works for web reading, including Kindle Cloud Reader in Chrome. It cannot read selections from native Kindle or Apple Books/iBooks apps, because Chrome extensions only run in Chrome.
 
 ## Future Capture
 
