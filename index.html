@@ -16,22 +16,22 @@
     <main class="app-shell">
       <section class="hero" aria-labelledby="app-title">
         <div>
-          <p class="kicker">Essay vocabulary record</p>
+          <p class="kicker">Vocabulary bookmarker</p>
           <h1 id="app-title">Dana's Word Bank</h1>
           <p class="hero-copy">
-            A running record of words learned while reading, with definitions, grammar, and the place each word came from.
+            Save a word, and the bank fills in the definition, grammar category, and captured reading source automatically.
           </p>
         </div>
         <div class="hero-tools" aria-label="Library stats">
           <span><strong id="word-count">0</strong> words</span>
-          <span><strong id="prose-count">0</strong> prose notes</span>
+          <span><strong id="source-count">0</strong> sources</span>
         </div>
       </section>
 
       <section class="controls" aria-label="Search and filters">
         <label class="search-field">
           <span>Search</span>
-          <input id="search-input" type="search" placeholder="Search words, definitions, or where you learned them" />
+          <input id="search-input" type="search" placeholder="Search saved words, definitions, or sources" />
         </label>
 
         <div class="filter-group" aria-label="Part of speech filter">
@@ -46,118 +46,29 @@
 
       <div class="workspace">
         <section class="entry-panel" aria-labelledby="word-form-title">
-          <h2 id="word-form-title">Add a Word</h2>
+          <h2 id="word-form-title">Bookmark a Word</h2>
           <form id="word-form">
             <label>
               Word
               <input id="word" name="word" autocomplete="off" placeholder="obsequious" required />
             </label>
 
-            <button id="lookup-definition" class="ghost-button lookup-button" type="button">Fill Definition</button>
-
-            <label>
-              Part of speech
-              <select id="part-of-speech" name="partOfSpeech">
-                <option value="noun">Noun</option>
-                <option value="verb">Verb</option>
-                <option value="adjective">Adjective</option>
-                <option value="adverb">Adverb</option>
-                <option value="other">Other</option>
-              </select>
-            </label>
-
-            <label>
-              Definition
-              <textarea id="definition" name="definition" rows="4" placeholder="Auto-filled when possible; editable before saving"></textarea>
-            </label>
-
-            <label>
-              Essay-use note
-              <textarea id="context" name="context" rows="3" placeholder="Example: useful for describing servile praise or calculated flattery"></textarea>
-            </label>
-
-            <div class="source-grid">
-              <label>
-                Book title
-                <input id="book-title" name="bookTitle" placeholder="Middlemarch" />
-              </label>
-
-              <label>
-                Author
-                <input id="author" name="author" placeholder="George Eliot" />
-              </label>
-            </div>
-
-            <div class="source-grid">
-              <label>
-                Publisher
-                <input id="publisher" name="publisher" placeholder="Penguin Classics" />
-              </label>
-
-              <label>
-                Year
-                <input id="year" name="year" inputmode="numeric" placeholder="2003" />
-              </label>
-            </div>
-
-            <label>
-              Where you learned it
-              <input id="learned-at" name="learnedAt" placeholder="Trillion Dollar Triage, page 42; article; class notes..." />
-            </label>
-
             <button class="primary-button" type="submit">Save Word</button>
           </form>
+          <p id="save-status" class="save-status" aria-live="polite"></p>
         </section>
 
         <section class="library-panel" aria-labelledby="library-title">
           <div class="panel-heading">
             <div>
-              <p class="eyebrow">Alphabetized automatically</p>
-              <h2 id="library-title">Words for Essays</h2>
+              <p class="eyebrow">Defined and sorted automatically</p>
+              <h2 id="library-title">Saved Words</h2>
             </div>
             <button id="clear-words" class="ghost-button" type="button">Clear all</button>
           </div>
           <div id="word-list" class="word-list" aria-live="polite"></div>
         </section>
       </div>
-
-      <section class="prose-section" aria-labelledby="prose-title">
-        <div class="prose-form">
-          <h2 id="prose-title">Strong Prose</h2>
-          <form id="prose-form">
-            <label>
-              Passage
-              <textarea id="prose-text" rows="4" required placeholder="A sentence or paragraph worth keeping"></textarea>
-            </label>
-            <div class="source-grid">
-              <label>
-                Book title
-                <input id="prose-book-title" placeholder="The Waves" />
-              </label>
-              <label>
-                Author
-                <input id="prose-author" placeholder="Virginia Woolf" />
-              </label>
-            </div>
-            <div class="source-grid">
-              <label>
-                Publisher
-                <input id="prose-publisher" placeholder="Harcourt" />
-              </label>
-              <label>
-                Year
-                <input id="prose-year" inputmode="numeric" placeholder="1931" />
-              </label>
-            </div>
-            <label>
-              Note
-              <input id="prose-note" placeholder="What made it work, or where you might imitate it" />
-            </label>
-            <button class="primary-button" type="submit">Save Prose</button>
-          </form>
-        </div>
-        <div id="prose-list" class="prose-list" aria-live="polite"></div>
-      </section>
     </main>
 
     <template id="word-card-template">
@@ -170,16 +81,7 @@
           <button class="icon-button delete-word" type="button" aria-label="Delete word">×</button>
         </div>
         <p class="definition"></p>
-        <p class="context"></p>
-        <footer></footer>
-      </article>
-    </template>
-
-    <template id="prose-card-template">
-      <article class="prose-card">
-        <button class="icon-button delete-prose prose-actions" type="button" aria-label="Delete prose">×</button>
-        <blockquote></blockquote>
-        <p class="prose-note"></p>
+        <p class="example"></p>
         <footer></footer>
       </article>
     </template>
