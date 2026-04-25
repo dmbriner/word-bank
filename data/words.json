@@ -17,6 +17,26 @@
       "example": "",
       "sources": [],
       "createdAt": "2026-04-24T00:00:00.000Z"
+    },
+    {
+      "id": "sacrosanct",
+      "word": "sacrosanct",
+      "partOfSpeech": "adjective",
+      "definition": "Beyond alteration, criticism, or interference, especially due to religious sanction; inviolable.",
+      "example": "",
+      "essayContext": "Useful when describing a person, argument, institution, or tone as beyond alteration, criticism, or interference, especially due to religious sanction; inviolable.",
+      "sources": [
+        {
+          "kind": "",
+          "title": "",
+          "author": "",
+          "url": "",
+          "app": "Chrome extension",
+          "location": "",
+          "savedAt": "2026-04-25T19:28:02.237Z"
+        }
+      ],
+      "createdAt": "2026-04-25T19:28:02.687Z"
     }
   ]
 }
