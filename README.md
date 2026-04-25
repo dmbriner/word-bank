@@ -30,6 +30,12 @@ Prose path: data/prose.json
 
 Paste a fine-grained GitHub token with repository contents read/write access for `dmbriner/word-bank`. The token is saved only in that browser. The page publishes words, favorite prose, and shared source metadata to the public site.
 
+Smart capture features:
+
+- The word form previews grammar type, definition, and an essay-use context before publishing.
+- The source form can look up a book title through Google Books, fill the author, and show a Chicago-style preview.
+- The phone web app uses the generated Dana's Word Bank icon from `icons/`.
+
 ## Private Chrome Extension
 
 Extension directory to select in Chrome:

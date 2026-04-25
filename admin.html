@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dana's Word Bank Capture</title>
     <link rel="icon" type="image/png" href="favicon.png" />
-    <link rel="apple-touch-icon" href="favicon.png" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
     <link rel="manifest" href="admin.webmanifest" />
     <meta name="theme-color" content="#241f1a" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -81,10 +81,13 @@
           <button id="clear-source" class="text-button" type="button">Clear</button>
         </div>
         <div class="source-grid">
-          <label class="wide-field">
-            Book or source
-            <input id="source-title-input" placeholder="Trillion Dollar Triage" autocomplete="off" />
-          </label>
+          <div class="lookup-row wide-field">
+            <label>
+              Book or source
+              <input id="source-title-input" placeholder="Trillion Dollar Triage" autocomplete="off" />
+            </label>
+            <button id="find-book" class="ghost-button compact-button" type="button">Find Book</button>
+          </div>
           <label>
             Author
             <input id="source-author" placeholder="Nick Timiraos" autocomplete="off" />
@@ -101,7 +104,9 @@
             Source URL
             <input id="source-url" type="url" placeholder="https://..." autocomplete="off" />
           </label>
+          <div id="book-suggestions" class="suggestion-list wide-field" hidden></div>
         </div>
+        <p class="preview-label">Chicago-style preview</p>
         <p id="source-preview" class="source-preview">Saved by Dana</p>
       </section>
 
@@ -120,7 +125,21 @@
             Word
             <input id="word" placeholder="obsequious" autocomplete="off" />
           </label>
-          <button class="primary-button" type="submit">Publish Word</button>
+          <section id="word-smart" class="smart-card" aria-live="polite" hidden>
+            <div class="smart-card-top">
+              <div>
+                <p class="eyebrow">Word profile</p>
+                <h3 id="word-smart-title">Word</h3>
+              </div>
+              <span id="word-part" class="type-pill">Part</span>
+            </div>
+            <p id="word-definition" class="smart-definition"></p>
+            <p id="word-context" class="smart-context"></p>
+          </section>
+          <div class="button-row">
+            <button class="primary-button" type="submit">Publish Word</button>
+            <button id="analyze-word" class="ghost-button" type="button">Analyze</button>
+          </div>
         </form>
 
         <form id="prose-form" class="capture-form" role="tabpanel" aria-labelledby="prose-tab" hidden>

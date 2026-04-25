@@ -118,14 +118,36 @@ export async function lookupWord(value) {
     const example = meaning?.definitions?.[0]?.example || "";
     const partOfSpeech = validParts.has(meaning?.partOfSpeech) ? meaning.partOfSpeech : "other";
 
-    return { partOfSpeech, definition, example };
+    return { partOfSpeech, definition, example, essayContext: essayContextFor({ partOfSpeech, definition, example }) };
   } catch (error) {
-    return {
+    const fallback = {
       partOfSpeech: "other",
       definition: "Definition not found automatically.",
       example: "",
     };
+
+    return {
+      ...fallback,
+      essayContext: essayContextFor(fallback),
+    };
   }
+}
+
+function essayContextFor({ partOfSpeech, definition, example }) {
+  if (example) {
+    return `In context: ${example}`;
+  }
+
+  const cleanDefinition = definition.replace(/\.$/, "").toLowerCase();
+  const templates = {
+    adjective: `Useful when describing a person, argument, institution, or tone as ${cleanDefinition}.`,
+    noun: `Useful when naming an abstract force, condition, or idea connected to ${cleanDefinition}.`,
+    verb: `Useful when analyzing how someone acts, changes, limits, or produces an effect: ${cleanDefinition}.`,
+    adverb: `Useful when sharpening how an action happens, especially when the manner matters: ${cleanDefinition}.`,
+    other: `Useful when you need a precise phrase for ${cleanDefinition}.`,
+  };
+
+  return templates[partOfSpeech] || templates.other;
 }
 
 export function buildSource({ title = "", author = "", url = "", app = "", location = "", kind = "" } = {}) {

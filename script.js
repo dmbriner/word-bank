@@ -131,7 +131,11 @@ function wordCard(entry) {
   card.querySelector("h3").textContent = entry.word;
   card.querySelector(".part").textContent = entry.partOfSpeech;
   card.querySelector(".definition").textContent = entry.definition;
-  card.querySelector(".example").textContent = entry.example ? `Example: ${entry.example}` : "";
+  card.querySelector(".example").textContent = entry.example
+    ? `Example: ${entry.example}`
+    : entry.essayContext
+      ? `Essay context: ${entry.essayContext}`
+      : "";
   card.querySelector("footer").replaceChildren(...sourceNodes(entry.sources || []));
   return card;
 }

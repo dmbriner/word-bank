@@ -8,6 +8,9 @@ const PRECACHE = [
   "/word-bank/admin.css",
   "/word-bank/admin.js",
   "/word-bank/favicon.png",
+  "/word-bank/apple-touch-icon.png",
+  "/word-bank/icons/icon-192.png",
+  "/word-bank/icons/icon-512.png",
   "/word-bank/manifest.json",
   "/word-bank/admin.webmanifest",
 ];

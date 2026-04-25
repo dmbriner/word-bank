@@ -156,6 +156,13 @@ h3 {
   grid-column: 1 / -1;
 }
 
+.lookup-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: end;
+}
+
 label {
   display: grid;
   gap: 7px;
@@ -196,6 +203,45 @@ textarea:focus {
   padding: 8px 0 8px 13px;
 }
 
+.preview-label {
+  margin: 14px 0 -6px;
+  color: var(--blue);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.suggestion-list {
+  display: grid;
+  gap: 8px;
+}
+
+.suggestion-button {
+  width: 100%;
+  min-height: 0;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fffefa;
+  color: var(--ink);
+  padding: 12px;
+  text-align: left;
+}
+
+.suggestion-button strong {
+  display: block;
+  font-family: "Libre Baskerville", Georgia, serif;
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+
+.suggestion-button span {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
 .tabs {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -225,9 +271,52 @@ textarea:focus {
   color: var(--accent);
 }
 
+.compact-button {
+  min-width: 104px;
+  padding: 0 13px;
+}
+
 .capture-form {
   display: grid;
   gap: 15px;
+}
+
+.smart-card {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fffefa;
+  padding: 16px;
+}
+
+.smart-card-top {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.type-pill {
+  flex: 0 0 auto;
+  border: 1px solid rgba(62, 102, 85, 0.34);
+  border-radius: 999px;
+  background: rgba(62, 102, 85, 0.08);
+  color: var(--green);
+  padding: 6px 10px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.smart-definition,
+.smart-context {
+  margin: 14px 0 0;
+  line-height: 1.65;
+}
+
+.smart-context {
+  color: var(--accent-dark);
+  font-size: 0.92rem;
 }
 
 .button-row {
@@ -282,7 +371,8 @@ textarea:focus {
 
   .settings-grid,
   .source-grid,
-  .button-row {
+  .button-row,
+  .lookup-row {
     grid-template-columns: 1fr;
   }
 

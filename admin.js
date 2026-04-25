@@ -36,14 +36,25 @@ const proseForm = document.querySelector("#prose-form");
 const wordTab = document.querySelector("#word-tab");
 const proseTab = document.querySelector("#prose-tab");
 const clearSource = document.querySelector("#clear-source");
+const findBook = document.querySelector("#find-book");
 const refreshRecent = document.querySelector("#refresh-recent");
+const analyzeWord = document.querySelector("#analyze-word");
 const testConnection = document.querySelector("#test-connection");
 const sourcePreview = document.querySelector("#source-preview");
 const publishStatus = document.querySelector("#publish-status");
 const settingsStatus = document.querySelector("#settings-status");
 const recentList = document.querySelector("#recent-list");
+const bookSuggestions = document.querySelector("#book-suggestions");
+const wordSmart = document.querySelector("#word-smart");
+const wordSmartTitle = document.querySelector("#word-smart-title");
+const wordPart = document.querySelector("#word-part");
+const wordDefinition = document.querySelector("#word-definition");
+const wordContext = document.querySelector("#word-context");
 
 let settings = loadSettings();
+let wordTimer = 0;
+let bookTimer = 0;
+const wordCache = new Map();
 
 fillSettings();
 fillSource();
@@ -85,17 +96,34 @@ testConnection.addEventListener("click", async () => {
   });
 });
 
+fields.sourceTitle.addEventListener("input", () => {
+  clearTimeout(bookTimer);
+  bookTimer = setTimeout(() => {
+    suggestBook(false);
+  }, 750);
+});
+
+fields.word.addEventListener("input", () => {
+  clearTimeout(wordTimer);
+  wordTimer = setTimeout(() => {
+    previewWord(false);
+  }, 550);
+});
+
 clearSource.addEventListener("click", () => {
   [fields.sourceTitle, fields.sourceAuthor, fields.sourceLocation, fields.sourceApp, fields.sourceUrl].forEach((field) => {
     field.value = "";
   });
   localStorage.removeItem(sourceKey);
   updateSourcePreview();
+  clearBookSuggestions();
 });
 
 wordTab.addEventListener("click", () => setActivePane("word"));
 proseTab.addEventListener("click", () => setActivePane("prose"));
 refreshRecent.addEventListener("click", loadRecent);
+findBook.addEventListener("click", () => suggestBook(true));
+analyzeWord.addEventListener("click", () => previewWord(true));
 
 wordForm.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -212,9 +240,204 @@ function updateSourcePreview() {
     return;
   }
 
-  sourcePreview.textContent = source.author && source.title
-    ? `${formatChicagoAuthor(source.author)}. ${source.title}${source.location ? `, ${source.location}` : ""}${source.app ? ` (${source.app})` : ""}`
-    : [source.title, source.location, source.app, source.url].filter(Boolean).join(" · ");
+  sourcePreview.replaceChildren(...sourcePreviewNodes(source));
+}
+
+function sourcePreviewNodes(source) {
+  if (source.author && source.title) {
+    const nodes = [document.createTextNode(`${formatChicagoAuthor(source.author)}. `)];
+    const title = document.createElement("em");
+    title.textContent = source.title;
+    nodes.push(title);
+
+    if (source.location) {
+      nodes.push(document.createTextNode(`, ${source.location}`));
+    }
+
+    if (source.app) {
+      nodes.push(document.createTextNode(` (${source.app})`));
+    }
+
+    return nodes;
+  }
+
+  return [document.createTextNode([source.title, source.location, source.app, source.url].filter(Boolean).join(" · "))];
+}
+
+async function previewWord(force) {
+  const clean = cleanWord(fields.word.value);
+
+  if (!clean) {
+    wordSmart.hidden = true;
+    return;
+  }
+
+  if (!force && (clean.length < 3 || clean.includes(" "))) {
+    return;
+  }
+
+  wordSmart.hidden = false;
+  wordSmartTitle.textContent = clean;
+  wordPart.textContent = "Checking";
+  wordDefinition.textContent = "Looking up the definition and grammar type...";
+  wordContext.textContent = "";
+
+  try {
+    const profile = await getWordProfile(clean);
+    wordSmartTitle.textContent = profile.word;
+    wordPart.textContent = profile.partOfSpeech;
+    wordDefinition.textContent = profile.definition;
+    wordContext.textContent = profile.essayContext;
+  } catch (error) {
+    wordPart.textContent = "Other";
+    wordDefinition.textContent = "Definition not found automatically.";
+    wordContext.textContent = "You can still publish it and refine it later.";
+  }
+}
+
+async function getWordProfile(value) {
+  const clean = cleanWord(value);
+  const key = clean.toLowerCase();
+
+  if (wordCache.has(key)) {
+    return wordCache.get(key);
+  }
+
+  const lookup = await lookupWord(clean);
+  const profile = {
+    word: clean,
+    ...lookup,
+    essayContext: essayContextFor(clean, lookup),
+  };
+
+  wordCache.set(key, profile);
+  return profile;
+}
+
+async function suggestBook(force) {
+  const title = fields.sourceTitle.value.trim();
+
+  if (!title || (!force && title.length < 5)) {
+    clearBookSuggestions();
+    return;
+  }
+
+  bookSuggestions.hidden = false;
+  bookSuggestions.replaceChildren(suggestionState("Looking for the book..."));
+
+  try {
+    const books = await lookupBooks(title);
+
+    if (!books.length) {
+      bookSuggestions.replaceChildren(suggestionState("No book match found. You can type the author manually."));
+      return;
+    }
+
+    const best = books[0];
+    const shouldAutoFill = !fields.sourceAuthor.value.trim() && isStrongBookMatch(title, best);
+    if (shouldAutoFill) {
+      applyBookSuggestion(best);
+    }
+
+    bookSuggestions.replaceChildren(...books.map(bookSuggestionButton));
+  } catch (error) {
+    bookSuggestions.replaceChildren(suggestionState("Book lookup could not connect. You can type the author manually."));
+  }
+}
+
+async function lookupBooks(title) {
+  const params = new URLSearchParams({
+    q: `intitle:"${title}"`,
+    maxResults: "5",
+    printType: "books",
+    projection: "lite",
+  });
+  const response = await fetch(`https://www.googleapis.com/books/v1/volumes?${params.toString()}`);
+
+  if (!response.ok) {
+    throw new Error("Book lookup failed.");
+  }
+
+  const data = await response.json();
+  return (data.items || [])
+    .map((item) => item.volumeInfo || {})
+    .filter((book) => book.title && book.authors?.length)
+    .map((book) => ({
+      title: book.title,
+      author: book.authors[0],
+      year: book.publishedDate?.slice(0, 4) || "",
+      url: book.infoLink || "",
+      score: bookMatchScore(title, book.title),
+    }))
+    .sort((a, b) => b.score - a.score);
+}
+
+function isStrongBookMatch(query, book) {
+  return book.score >= 90;
+}
+
+function bookMatchScore(query, title) {
+  const normalizedQuery = normalizeText(query);
+  const normalizedTitle = normalizeText(title);
+  let score = 0;
+
+  if (normalizedTitle === normalizedQuery) {
+    score = 100;
+  } else if (normalizedTitle.includes(normalizedQuery)) {
+    score = 70;
+  } else if (normalizedQuery.includes(normalizedTitle)) {
+    score = 55;
+  }
+
+  if (/^(summary|study guide|analysis|workbook)\b/.test(normalizedTitle)) {
+    score -= 45;
+  }
+
+  return score;
+}
+
+function bookSuggestionButton(book) {
+  const button = document.createElement("button");
+  button.className = "suggestion-button";
+  button.type = "button";
+
+  const title = document.createElement("strong");
+  title.textContent = book.title;
+
+  const meta = document.createElement("span");
+  meta.textContent = [book.author, book.year].filter(Boolean).join(" · ");
+
+  button.append(title, meta);
+  button.addEventListener("click", () => {
+    applyBookSuggestion(book);
+    clearBookSuggestions();
+  });
+
+  return button;
+}
+
+function applyBookSuggestion(book) {
+  fields.sourceTitle.value = book.title;
+  fields.sourceAuthor.value = book.author;
+
+  if (book.url && !fields.sourceUrl.value.trim()) {
+    fields.sourceUrl.value = book.url;
+  }
+
+  localStorage.setItem(sourceKey, JSON.stringify(readSourceFields()));
+  updateSourcePreview();
+}
+
+function suggestionState(message) {
+  const item = document.createElement("p");
+  item.className = "empty-state";
+  item.textContent = message;
+  return item;
+}
+
+function clearBookSuggestions() {
+  bookSuggestions.hidden = true;
+  bookSuggestions.textContent = "";
 }
 
 async function publishWord(value) {
@@ -225,13 +448,19 @@ async function publishWord(value) {
 
   const file = await fetchJsonFile(settings.wordsPath);
   const data = { words: Array.isArray(file.data.words) ? file.data.words : [] };
-  const lookup = await lookupWord(clean);
+  const lookup = await getWordProfile(clean);
   const source = buildWordSource();
   const existing = data.words.find((entry) => entry.word.toLowerCase() === clean.toLowerCase());
+  const savedLookup = {
+    partOfSpeech: lookup.partOfSpeech,
+    definition: lookup.definition,
+    example: lookup.example,
+    essayContext: lookup.essayContext,
+  };
 
   if (existing) {
     Object.assign(existing, {
-      ...lookup,
+      ...savedLookup,
       sources: addSource(existing.sources || [], source),
       updatedAt: new Date().toISOString(),
     });
@@ -239,7 +468,7 @@ async function publishWord(value) {
     data.words.push({
       id: slugify(clean),
       word: clean,
-      ...lookup,
+      ...savedLookup,
       sources: addSource([], source),
       createdAt: new Date().toISOString(),
     });
@@ -410,6 +639,31 @@ function cleanWord(value) {
     .trim()
     .replace(/^[^\w'-]+|[^\w'-]+$/g, "")
     .replace(/\s+/g, " ");
+}
+
+function normalizeText(value) {
+  return String(value)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function essayContextFor(word, lookup) {
+  const definition = lookup.definition.replace(/\.$/, "").toLowerCase();
+
+  if (lookup.example) {
+    return `In context: ${lookup.example}`;
+  }
+
+  const templates = {
+    adjective: `Useful when describing a person, argument, institution, or tone as ${definition}.`,
+    noun: `Useful when naming an abstract force, condition, or idea connected to ${definition}.`,
+    verb: `Useful when analyzing how someone acts, changes, limits, or produces an effect: ${definition}.`,
+    adverb: `Useful when sharpening how an action happens, especially when the manner matters: ${definition}.`,
+    other: `Useful when you need a precise phrase for ${definition}.`,
+  };
+
+  return templates[lookup.partOfSpeech] || templates.other;
 }
 
 function slugify(value) {
