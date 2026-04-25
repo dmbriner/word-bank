@@ -45,16 +45,7 @@ func drawIcon(size: Int, output: URL) throws {
   NSGraphicsContext.saveGraphicsState()
   NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: rep)
   NSGraphicsContext.current?.imageInterpolation = .high
-
-  let full = NSRect(x: 0, y: 0, width: canvas, height: canvas)
-  hex("4b2b35").setFill()
-  NSBezierPath(rect: full).fill()
-
-  hex("8b2f2d").setFill()
-  NSBezierPath(rect: rect(0, 0, 512, 136, scale)).fill()
-
-  hex("b87b2f").setFill()
-  NSBezierPath(rect: rect(0, 376, 92, 136, scale)).fill()
+  NSGraphicsContext.current?.shouldAntialias = true
 
   drawBook(scale: scale)
   drawMonogram(scale: scale)
@@ -69,57 +60,73 @@ func drawIcon(size: Int, output: URL) throws {
 }
 
 func drawBook(scale: CGFloat) {
-  hex("fffaf0").setFill()
-  NSBezierPath(roundedRect: rect(86, 148, 340, 238, scale), xRadius: 34 * scale, yRadius: 34 * scale).fill()
+  let full = rect(0, 0, 512, 512, scale)
+  hex("ffffff").setFill()
+  NSBezierPath(rect: full).fill()
 
-  hex("efe2ce").setFill()
-  NSBezierPath(rect: rect(252, 162, 8, 204, scale)).fill()
+  let cover = NSBezierPath(roundedRect: rect(24, 24, 464, 464, scale), xRadius: 82 * scale, yRadius: 82 * scale)
+  NSGraphicsContext.saveGraphicsState()
+  let shadow = NSShadow()
+  shadow.shadowColor = hex("9b7f5e", alpha: 0.14)
+  shadow.shadowOffset = NSSize(width: 0, height: -5 * scale)
+  shadow.shadowBlurRadius = 11 * scale
+  shadow.set()
 
-  hex("f7eddc").setFill()
-  NSBezierPath(roundedRect: rect(107, 170, 136, 178, scale), xRadius: 18 * scale, yRadius: 18 * scale).fill()
-  NSBezierPath(roundedRect: rect(269, 170, 136, 178, scale), xRadius: 18 * scale, yRadius: 18 * scale).fill()
+  let coverGradient = NSGradient(colors: [
+    hex("ffffff"),
+    hex("fffefd"),
+    hex("fff9ef"),
+  ])!
+  coverGradient.draw(in: cover, angle: 90)
+  NSGraphicsContext.restoreGraphicsState()
 
-  hex("ded0bd").setStroke()
-  for offset in [0, 22, 44] {
-    let y = CGFloat(220 + offset) * scale
-    line(from: CGPoint(x: 126 * scale, y: y), to: CGPoint(x: 224 * scale, y: y), width: 4 * scale)
-    line(from: CGPoint(x: 288 * scale, y: y), to: CGPoint(x: 386 * scale, y: y), width: 4 * scale)
-  }
+  hex("e4d7c5").setStroke()
+  cover.lineWidth = 5 * scale
+  cover.stroke()
 
-  hex("8b2f2d").setFill()
+  hex("efe3d2").setStroke()
+  let inset = NSBezierPath(roundedRect: rect(48, 48, 416, 416, scale), xRadius: 58 * scale, yRadius: 58 * scale)
+  inset.lineWidth = 2 * scale
+  inset.stroke()
+
+  hex("eadfcf", alpha: 0.95).setStroke()
+  line(from: CGPoint(x: 104 * scale, y: 118 * scale), to: CGPoint(x: 350 * scale, y: 118 * scale), width: 3 * scale)
+  line(from: CGPoint(x: 104 * scale, y: 394 * scale), to: CGPoint(x: 350 * scale, y: 394 * scale), width: 3 * scale)
+
+  hex("e8dac7").setStroke()
+  line(from: CGPoint(x: 104 * scale, y: 238 * scale), to: CGPoint(x: 346 * scale, y: 238 * scale), width: 4 * scale)
+  line(from: CGPoint(x: 104 * scale, y: 212 * scale), to: CGPoint(x: 330 * scale, y: 212 * scale), width: 4 * scale)
+
+  hex("a7433d").setFill()
   let ribbon = NSBezierPath()
-  ribbon.move(to: CGPoint(x: 347 * scale, y: 172 * scale))
-  ribbon.line(to: CGPoint(x: 386 * scale, y: 172 * scale))
-  ribbon.line(to: CGPoint(x: 386 * scale, y: 346 * scale))
-  ribbon.line(to: CGPoint(x: 366 * scale, y: 322 * scale))
-  ribbon.line(to: CGPoint(x: 347 * scale, y: 346 * scale))
+  ribbon.move(to: CGPoint(x: 376 * scale, y: 88 * scale))
+  ribbon.line(to: CGPoint(x: 426 * scale, y: 88 * scale))
+  ribbon.line(to: CGPoint(x: 426 * scale, y: 416 * scale))
+  ribbon.line(to: CGPoint(x: 401 * scale, y: 380 * scale))
+  ribbon.line(to: CGPoint(x: 376 * scale, y: 416 * scale))
   ribbon.close()
   ribbon.fill()
+
+  hex("d0a252", alpha: 0.9).setFill()
+  NSBezierPath(roundedRect: rect(376, 88, 50, 9, scale), xRadius: 4.5 * scale, yRadius: 4.5 * scale).fill()
 }
 
 func drawMonogram(scale: CGFloat) {
-  let font = NSFont(name: "Didot Bold", size: 150 * scale)
-    ?? NSFont(name: "Georgia-Bold", size: 150 * scale)
-    ?? NSFont.systemFont(ofSize: 150 * scale, weight: .bold)
+  let font = NSFont(name: "Didot Bold", size: 212 * scale)
+    ?? NSFont(name: "Bodoni 72 Smallcaps Book", size: 212 * scale)
+    ?? NSFont(name: "Georgia-Bold", size: 212 * scale)
+    ?? NSFont.systemFont(ofSize: 212 * scale, weight: .bold)
   let attrs: [NSAttributedString.Key: Any] = [
     .font: font,
-    .foregroundColor: hex("241f1a"),
+    .foregroundColor: hex("231d19"),
   ]
 
   let letter = NSAttributedString(string: "D", attributes: attrs)
   let letterSize = letter.size()
-  letter.draw(at: CGPoint(x: (256 * scale) - (letterSize.width / 2), y: 188 * scale))
+  letter.draw(at: CGPoint(x: (234 * scale) - (letterSize.width / 2), y: 160 * scale))
 
-  let smallFont = NSFont(name: "AvenirNextCondensed-Heavy", size: 42 * scale)
-    ?? NSFont.systemFont(ofSize: 42 * scale, weight: .heavy)
-  let smallAttrs: [NSAttributedString.Key: Any] = [
-    .font: smallFont,
-    .foregroundColor: hex("8b2f2d"),
-    .kern: 1.4 * scale,
-  ]
-  let small = NSAttributedString(string: "WB", attributes: smallAttrs)
-  let smallSize = small.size()
-  small.draw(at: CGPoint(x: (256 * scale) - (smallSize.width / 2), y: 164 * scale))
+  hex("c99a49").setFill()
+  NSBezierPath(roundedRect: rect(186, 156, 96, 8, scale), xRadius: 4 * scale, yRadius: 4 * scale).fill()
 }
 
 func line(from: CGPoint, to: CGPoint, width: CGFloat) {
