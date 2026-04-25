@@ -105,7 +105,9 @@ function renderProse() {
 function proseCard(entry) {
   const card = proseTemplate.content.firstElementChild.cloneNode(true);
   card.querySelector("blockquote").textContent = entry.text;
-  card.querySelector("footer").replaceChildren(...proseSourceNodes(entry));
+  const footer = card.querySelector("footer");
+  footer.replaceChildren(...proseSourceNodes(entry));
+  footer.hidden = !footer.childNodes.length;
   return card;
 }
 
@@ -120,7 +122,7 @@ function proseSourceNodes(entry) {
   };
 
   if (!source.title && !source.author && !source.location && !source.app && !source.url) {
-    return [document.createTextNode("Saved by Dana")];
+    return [];
   }
 
   return sourceLabelNodes(source);
@@ -136,16 +138,18 @@ function wordCard(entry) {
     : entry.essayContext
       ? `Essay context: ${entry.essayContext}`
       : "";
-  card.querySelector("footer").replaceChildren(...sourceNodes(entry.sources || []));
+  const footer = card.querySelector("footer");
+  footer.replaceChildren(...sourceNodes(entry.sources || []));
+  footer.hidden = !footer.childNodes.length;
   return card;
 }
 
 function sourceNodes(sources) {
-  if (!sources.length) {
-    return [document.createTextNode("Saved by Dana")];
-  }
-
   return sources.flatMap((source, index) => {
+    if (!hasSourceDetails(source)) {
+      return [];
+    }
+
     const separator = index ? [document.createElement("br")] : [];
     const node = source.url && source.kind !== "book" ? document.createElement("a") : document.createElement("span");
     node.append(...sourceLabelNodes(source));
@@ -162,7 +166,7 @@ function sourceNodes(sources) {
 }
 
 function sourceLabelNodes(source) {
-  const nodes = [document.createTextNode("Saved from: ")];
+  const nodes = [document.createTextNode("Saved from ")];
 
   if (source.kind === "book" && source.title) {
     if (source.author) {
@@ -186,6 +190,10 @@ function sourceLabelNodes(source) {
 
   nodes.push(document.createTextNode(source.title || source.app || source.url || "Captured source"));
   return nodes;
+}
+
+function hasSourceDetails(source) {
+  return Boolean(source?.title || source?.author || source?.location || source?.app || source?.url);
 }
 
 function formatChicagoAuthor(author) {
