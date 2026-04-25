@@ -16,10 +16,10 @@
     <main class="app-shell">
       <section class="hero" aria-labelledby="app-title">
         <div>
-          <p class="kicker">Vocabulary bookmarker</p>
+          <p class="kicker">Public vocabulary dictionary</p>
           <h1 id="app-title">Dana's Word Bank</h1>
           <p class="hero-copy">
-            Save a word, and the bank fills in the definition, grammar category, and captured reading source automatically.
+            A public record of words Dana has saved while reading, defined and organized for essay writing.
           </p>
         </div>
         <div class="hero-tools" aria-label="Library stats">
@@ -44,31 +44,15 @@
         </div>
       </section>
 
-      <div class="workspace">
-        <section class="entry-panel" aria-labelledby="word-form-title">
-          <h2 id="word-form-title">Bookmark a Word</h2>
-          <form id="word-form">
-            <label>
-              Word
-              <input id="word" name="word" autocomplete="off" placeholder="obsequious" required />
-            </label>
-
-            <button class="primary-button" type="submit">Save Word</button>
-          </form>
-          <p id="save-status" class="save-status" aria-live="polite"></p>
-        </section>
-
-        <section class="library-panel" aria-labelledby="library-title">
-          <div class="panel-heading">
-            <div>
-              <p class="eyebrow">Defined and sorted automatically</p>
-              <h2 id="library-title">Saved Words</h2>
-            </div>
-            <button id="clear-words" class="ghost-button" type="button">Clear all</button>
+      <section class="library-panel" aria-labelledby="library-title">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Defined and sorted automatically</p>
+            <h2 id="library-title">Saved Words</h2>
           </div>
-          <div id="word-list" class="word-list" aria-live="polite"></div>
-        </section>
-      </div>
+        </div>
+        <div id="word-list" class="word-list" aria-live="polite"></div>
+      </section>
     </main>
 
     <template id="word-card-template">
@@ -78,7 +62,6 @@
             <p class="part"></p>
             <h3></h3>
           </div>
-          <button class="icon-button delete-word" type="button" aria-label="Delete word">×</button>
         </div>
         <p class="definition"></p>
         <p class="example"></p>

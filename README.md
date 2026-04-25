@@ -1,6 +1,6 @@
 # Dana's Word Bank
 
-A private, static word bank for bookmarking essay vocabulary. Type or capture a word and the site fills in the definition and grammar category automatically.
+A public, read-only word bank for Dana's essay vocabulary. The site displays a shared dictionary from `data/words.json`; only someone with write access to this repository can publish new words.
 
 Deploy target:
 
@@ -10,18 +10,22 @@ https://dmbriner.github.io/word-bank/
 
 The site is plain HTML, CSS, and JavaScript, so GitHub Pages can serve it directly from the repository root.
 
-## Capture Hook
+## Add Words
 
-The site can auto-save words from a URL with query parameters:
+From this repository, run:
 
-```text
-https://dmbriner.github.io/word-bank/?word=obsequious&sourceTitle=Article%20Title&sourceUrl=https%3A%2F%2Fexample.com
+```bash
+node tools/add-word.mjs obsequious
 ```
 
-That is the path a bookmarklet or browser extension should use. A simple web-reading bookmarklet can send the selected word and page title:
+Optionally include source metadata:
 
-```javascript
-javascript:(()=>{const word=(getSelection()+"").trim();if(!word){alert("Select a word first.");return;}const url=new URL("https://dmbriner.github.io/word-bank/");url.searchParams.set("word",word);url.searchParams.set("sourceTitle",document.title);url.searchParams.set("sourceUrl",location.href);location.href=url.toString();})();
+```bash
+node tools/add-word.mjs obsequious --source-title "Trillion Dollar Triage" --app Kindle
 ```
 
-Kindle and Apple Books native apps do not expose reading context directly to a static website. To automate those, the next step is a companion importer for Kindle Vocabulary Builder / highlights exports or an Apple Books local-library importer.
+The script fills in the definition and grammar category automatically, then updates `data/words.json`. Commit and deploy the changed data file to publish the word.
+
+## Future Capture
+
+Kindle and Apple Books native apps do not expose reading context directly to a static website. To automate those securely, the next step is a private capture tool that authenticates as Dana and writes to this repository or to a small backend, while the public website remains read-only.
