@@ -1,0 +1,19 @@
+{
+  "name": "Dana's Word Bank",
+  "short_name": "Word Bank",
+  "description": "My favorite words and phrasings, saved while reading.",
+  "start_url": "/word-bank/",
+  "scope": "/word-bank/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fbf8f1",
+  "theme_color": "#241f1a",
+  "icons": [
+    {
+      "src": "/word-bank/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
