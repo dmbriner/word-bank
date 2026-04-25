@@ -82,3 +82,10 @@ button {
   color: var(--green);
   font: 700 0.82rem Inter, system-ui, sans-serif;
 }
+
+.hint {
+  margin: 0;
+  color: var(--muted);
+  font: 700 0.78rem Inter, system-ui, sans-serif;
+  line-height: 1.45;
+}

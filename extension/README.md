@@ -14,9 +14,21 @@ This is a private unpacked Chrome extension for saving words to Dana's public re
 ## Use
 
 - Select a word in Chrome, right-click it, and choose **Save to Dana's Word Bank**.
+- In browser-based books, select a word and press **Command+Shift+S** on Mac or **Ctrl+Shift+S** on Windows.
 - Use the popup for a quick manual save.
 - Use the options page to add book metadata or bulk upload a word list.
 
+## Book Readers
+
+Works best in browser readers:
+
+- Kindle Cloud Reader: `https://read.amazon.com`
+- Google Books / Google Play Books in Chrome
+- Internet Archive books in Chrome
+- Articles, PDFs, and webpages opened in Chrome
+
+If right-click does not show the extension menu inside a reader, use the keyboard shortcut instead.
+
 ## Limits
 
-This works inside Chrome, including normal web pages and Kindle Cloud Reader. It cannot read selected text from native Kindle or Apple Books/iBooks apps. Those need a separate Mac local app, import tool, or Shortcut.
+This works inside Chrome. It cannot read selected text from native Kindle or Apple Books/iBooks apps because Chrome extensions cannot run inside other Mac apps. Those need a separate Mac local app, import tool, or Shortcut.

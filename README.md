@@ -47,6 +47,7 @@ This repo includes an unpacked Chrome extension in `extension/`. Load it from `c
 Once configured, you can:
 
 - Select a word in Chrome and right-click “Save to Dana's Word Bank.”
+- Select a word in a browser-based book and press Command+Shift+S.
 - Use the extension popup for quick manual saves.
 - Use the extension options page to add book metadata or bulk upload a word list.
 
