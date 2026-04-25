@@ -1,11 +1,14 @@
 const wordList = document.querySelector("#word-list");
+const proseList = document.querySelector("#prose-list");
 const searchInput = document.querySelector("#search-input");
 const filterButtons = document.querySelectorAll(".filter-button");
 const wordCount = document.querySelector("#word-count");
-const sourceCount = document.querySelector("#source-count");
+const proseCount = document.querySelector("#prose-count");
 const wordTemplate = document.querySelector("#word-card-template");
+const proseTemplate = document.querySelector("#prose-card-template");
 
 let words = [];
+let prose = [];
 let activeFilter = "all";
 
 function normalize(value) {
@@ -22,6 +25,10 @@ function getSearchBlob(item) {
   ]
     .join(" ")
     .toLowerCase();
+}
+
+function getProseSearchBlob(item) {
+  return [item.text, item.title, item.author, item.sourceTitle, item.sourceAuthor, item.location, item.app].join(" ").toLowerCase();
 }
 
 function sortedWords() {
@@ -77,6 +84,46 @@ function renderWords() {
   });
 
   updateCounts();
+}
+
+function renderProse() {
+  const query = normalize(searchInput.value);
+  const visibleProse = prose.filter((entry) => !query || getProseSearchBlob(entry).includes(query));
+
+  proseList.textContent = "";
+
+  if (!visibleProse.length) {
+    proseList.append(emptyState(prose.length ? "No favorite phrasings match this search." : "No favorite phrasings have been published yet."));
+    updateCounts();
+    return;
+  }
+
+  visibleProse.forEach((entry) => proseList.append(proseCard(entry)));
+  updateCounts();
+}
+
+function proseCard(entry) {
+  const card = proseTemplate.content.firstElementChild.cloneNode(true);
+  card.querySelector("blockquote").textContent = entry.text;
+  card.querySelector("footer").replaceChildren(...proseSourceNodes(entry));
+  return card;
+}
+
+function proseSourceNodes(entry) {
+  const source = {
+    kind: entry.kind || (entry.sourceAuthor || entry.author ? "book" : ""),
+    title: entry.sourceTitle || entry.title || "",
+    author: entry.sourceAuthor || entry.author || "",
+    location: entry.location || "",
+    app: entry.app || "",
+    url: entry.url || "",
+  };
+
+  if (!source.title && !source.author && !source.location && !source.app && !source.url) {
+    return [document.createTextNode("Saved by Dana")];
+  }
+
+  return sourceLabelNodes(source);
 }
 
 function wordCard(entry) {
@@ -160,7 +207,7 @@ function emptyState(message) {
 
 function updateCounts() {
   wordCount.textContent = words.length;
-  sourceCount.textContent = new Set(words.flatMap((entry) => (entry.sources || []).map((source) => source.title || source.url || source.app))).size;
+  proseCount.textContent = prose.length;
 }
 
 async function loadPublishedWords() {
@@ -180,6 +227,23 @@ async function loadPublishedWords() {
   renderWords();
 }
 
+async function loadPublishedProse() {
+  try {
+    const response = await fetch("data/prose.json", { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error("Could not load published prose");
+    }
+
+    const data = await response.json();
+    prose = Array.isArray(data.prose) ? data.prose : [];
+  } catch (error) {
+    prose = [];
+    proseList.append(emptyState("The published prose could not be loaded."));
+  }
+
+  renderProse();
+}
+
 filterButtons.forEach((button) => {
   button.addEventListener("click", () => {
     filterButtons.forEach((item) => item.classList.remove("active"));
@@ -189,6 +253,10 @@ filterButtons.forEach((button) => {
   });
 });
 
-searchInput.addEventListener("input", renderWords);
+searchInput.addEventListener("input", () => {
+  renderWords();
+  renderProse();
+});
 
 loadPublishedWords();
+loadPublishedProse();
