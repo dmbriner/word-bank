@@ -46,6 +46,6 @@ Extension directory to select in Chrome:
 
 The extension uses the same GitHub data path as the web capture page. Paste the same token in the extension options if you want right-click and keyboard capture inside Chrome.
 
-## Optional Local Tools
+## Maintenance Scripts
 
-The older Mac helper scripts are still in `tools/`, but the web capture page is now the simpler path for everyday use.
+The `tools/` folder keeps small maintenance scripts for adding words/prose from the command line and regenerating the app icons. Everyday capture should happen from the web capture page or the Chrome extension.

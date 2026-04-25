@@ -48,12 +48,4 @@ If right-click does not show the extension menu inside a reader, use the keyboar
 
 ## Limits
 
-This works inside Chrome. It cannot read selected text from native Kindle or Apple Books/iBooks apps because Chrome extensions cannot run inside other Mac apps. Those need a separate Mac local app, import tool, or Shortcut.
-
-The repo includes that local helper in `tools/`:
-
-- `tools/capture-word-mac.zsh` saves selected native-app text as a vocabulary word.
-- `tools/capture-prose-mac.zsh` saves selected native-app text as a favorite phrasing.
-- `tools/import-kindle-clippings.mjs` imports Kindle `My Clippings.txt` exports.
-
-Add `--ask-source` to a Mac helper command when you want it to prompt for book title, author, and page/location before saving.
+This works inside Chrome. For phone use, prose, and fuller source details, use the web capture page at `https://dmbriner.github.io/word-bank/admin.html`.

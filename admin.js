@@ -236,7 +236,7 @@ function buildProseEntry(text, existing) {
 function updateSourcePreview() {
   const source = readSourceFields();
   if (!source.title && !source.author && !source.location && !source.app && !source.url) {
-    sourcePreview.textContent = "Saved by Dana";
+    sourcePreview.textContent = "No source selected yet.";
     return;
   }
 
