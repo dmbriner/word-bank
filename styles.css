@@ -215,14 +215,16 @@ textarea:focus {
 }
 
 .entry-panel,
-.library-panel {
+.library-panel,
+.prose-panel {
   background: rgba(255, 253, 248, 0.9);
   border: 1px solid rgba(36, 31, 26, 0.15);
   box-shadow: var(--shadow);
 }
 
 .entry-panel,
-.library-panel {
+.library-panel,
+.prose-panel {
   padding: 22px;
 }
 
@@ -273,7 +275,8 @@ form {
   gap: 14px;
 }
 
-.word-card {
+.word-card,
+.prose-card {
   position: relative;
   border: 1px solid var(--line);
   border-radius: 6px;
@@ -334,6 +337,23 @@ footer {
   text-underline-offset: 3px;
 }
 
+.prose-panel {
+  margin-top: 20px;
+}
+
+.prose-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+blockquote {
+  margin: 0;
+  font-family: "Libre Baskerville", Georgia, serif;
+  font-size: 1.05rem;
+  line-height: 1.8;
+}
+
 .empty-state {
   grid-column: 1 / -1;
   border: 1px dashed var(--line);
@@ -371,7 +391,8 @@ footer {
   }
 
   .entry-panel,
-  .library-panel {
+  .library-panel,
+  .prose-panel {
     padding: 16px;
   }
 }
