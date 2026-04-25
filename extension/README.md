@@ -4,12 +4,28 @@ This is a private unpacked Chrome extension for saving words to Dana's public re
 
 ## Install
 
-1. Open `chrome://extensions`.
+Extension directory to select in Chrome:
+
+```text
+/Users/danabriner/Desktop/Projects/word-bank/extension
+```
+
+1. Open Chrome and go to `chrome://extensions`.
 2. Turn on Developer Mode.
 3. Click **Load unpacked**.
-4. Select this `extension/` folder.
-5. Open the extension options.
-6. Add a fine-grained GitHub token with repository contents read/write access for `dmbriner/word-bank`.
+4. Select `/Users/danabriner/Desktop/Projects/word-bank/extension`.
+5. Pin **Dana's Word Bank** from the puzzle-piece extensions menu.
+6. Open the extension options.
+7. Add a fine-grained GitHub token with repository contents read/write access for `dmbriner/word-bank`.
+
+Use these option values:
+
+```text
+Owner: dmbriner
+Repository: word-bank
+Branch: main
+Data path: data/words.json
+```
 
 ## Use
 
@@ -32,3 +48,11 @@ If right-click does not show the extension menu inside a reader, use the keyboar
 ## Limits
 
 This works inside Chrome. It cannot read selected text from native Kindle or Apple Books/iBooks apps because Chrome extensions cannot run inside other Mac apps. Those need a separate Mac local app, import tool, or Shortcut.
+
+The repo includes that local helper in `tools/`:
+
+- `tools/capture-word-mac.zsh` saves selected native-app text as a vocabulary word.
+- `tools/capture-prose-mac.zsh` saves selected native-app text as a favorite phrasing.
+- `tools/import-kindle-clippings.mjs` imports Kindle `My Clippings.txt` exports.
+
+Add `--ask-source` to a Mac helper command when you want it to prompt for book title, author, and page/location before saving.
