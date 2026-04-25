@@ -16,15 +16,15 @@
     <main class="app-shell">
       <section class="hero" aria-labelledby="app-title">
         <div>
-          <p class="kicker">Public vocabulary dictionary</p>
+          <p class="kicker">Vocabulary dictionary</p>
           <h1 id="app-title">Dana's Word Bank</h1>
           <p class="hero-copy">
-            A public record of words Dana has saved while reading, defined and organized for essay writing.
+            My favorite words and phrasings, saved while reading and organized for essay writing.
           </p>
         </div>
         <div class="hero-tools" aria-label="Library stats">
           <span><strong id="word-count">0</strong> words</span>
-          <span><strong id="source-count">0</strong> sources</span>
+          <span><strong id="prose-count">0</strong> phrasings</span>
         </div>
       </section>
 
@@ -53,6 +53,16 @@
         </div>
         <div id="word-list" class="word-list" aria-live="polite"></div>
       </section>
+
+      <section class="prose-panel" aria-labelledby="prose-title">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Strong prose</p>
+            <h2 id="prose-title">Favorite Phrasings</h2>
+          </div>
+        </div>
+        <div id="prose-list" class="prose-list" aria-live="polite"></div>
+      </section>
     </main>
 
     <template id="word-card-template">
@@ -65,6 +75,13 @@
         </div>
         <p class="definition"></p>
         <p class="example"></p>
+        <footer></footer>
+      </article>
+    </template>
+
+    <template id="prose-card-template">
+      <article class="prose-card">
+        <blockquote></blockquote>
         <footer></footer>
       </article>
     </template>
