@@ -1,0 +1,37 @@
+{
+  "prose": [
+    {
+      "id": "perilous-game-hot-potato",
+      "text": "A perilous game of hot potato",
+      "kind": "book",
+      "sourceTitle": "Trillion Dollar Triage: How Jay Powell and the Fed Battled a President and a Pandemic--and Prevented Economic Disaster",
+      "sourceAuthor": "Nick Timiraos",
+      "location": "",
+      "app": "",
+      "url": "",
+      "createdAt": "2026-04-24T00:00:00.000Z"
+    },
+    {
+      "id": "ambiguity-has-its-uses",
+      "text": "Ambiguity has its uses",
+      "kind": "book",
+      "sourceTitle": "Trillion Dollar Triage: How Jay Powell and the Fed Battled a President and a Pandemic--and Prevented Economic Disaster",
+      "sourceAuthor": "Nick Timiraos",
+      "location": "",
+      "app": "",
+      "url": "",
+      "createdAt": "2026-04-24T00:00:00.000Z"
+    },
+    {
+      "id": "carnival-creativity-greed",
+      "text": "the latest act in the carnival of creativity and greed that powers the nation forward",
+      "kind": "book",
+      "sourceTitle": "More Money than God",
+      "sourceAuthor": "Sebastian Mallaby",
+      "location": "",
+      "app": "",
+      "url": "",
+      "createdAt": "2026-04-24T00:00:00.000Z"
+    }
+  ]
+}

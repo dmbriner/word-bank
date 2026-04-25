@@ -32,6 +32,14 @@ node tools/add-word.mjs sacrosanct --source-title "More Money than God" --author
 
 The script fills in the definition and grammar category automatically, then updates `data/words.json`. Commit and deploy the changed data file to publish the word.
 
+## Add Favorite Prose
+
+```bash
+node tools/add-prose.mjs "Ambiguity has its uses" --source-title "Trillion Dollar Triage" --author "Nick Timiraos"
+```
+
+This updates `data/prose.json`, which feeds the public Favorite Phrasings section.
+
 ## Private Chrome Extension
 
 This repo includes an unpacked Chrome extension in `extension/`. Load it from `chrome://extensions` with Developer Mode on, then open the extension options and add a fine-grained GitHub token that can read/write repository contents for `dmbriner/word-bank`.
