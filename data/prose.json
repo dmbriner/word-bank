@@ -1,6 +1,17 @@
 {
   "prose": [
     {
+      "id": "packed-political-punch",
+      "text": "packed political punch",
+      "kind": "book",
+      "sourceTitle": "The Man Who Knew",
+      "sourceAuthor": "Sebastian Mallaby",
+      "location": "",
+      "app": "",
+      "url": "https://play.google.com/store/books/details?id=PwFdEQAAQBAJ&source=gbs_api",
+      "createdAt": "2026-04-25T19:25:01.640Z"
+    },
+    {
       "id": "perilous-game-hot-potato",
       "text": "A perilous game of hot potato",
       "kind": "book",
