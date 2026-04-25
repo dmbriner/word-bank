@@ -1,5 +1,16 @@
-const CACHE = "word-bank-v1";
-const PRECACHE = ["/word-bank/", "/word-bank/index.html", "/word-bank/styles.css", "/word-bank/script.js", "/word-bank/favicon.png"];
+const CACHE = "word-bank-v2";
+const PRECACHE = [
+  "/word-bank/",
+  "/word-bank/index.html",
+  "/word-bank/styles.css",
+  "/word-bank/script.js",
+  "/word-bank/admin.html",
+  "/word-bank/admin.css",
+  "/word-bank/admin.js",
+  "/word-bank/favicon.png",
+  "/word-bank/manifest.json",
+  "/word-bank/admin.webmanifest",
+];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(PRECACHE)).then(() => self.skipWaiting()));

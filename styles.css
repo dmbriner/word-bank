@@ -119,6 +119,18 @@ h3 {
   border: 1px solid rgba(36, 31, 26, 0.15);
 }
 
+.capture-link {
+  display: grid;
+  place-items: center;
+  min-height: 42px;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  background: var(--accent);
+  color: white;
+  font-weight: 800;
+  text-decoration: none;
+}
+
 .controls {
   display: grid;
   grid-template-columns: minmax(260px, 1fr) auto;

@@ -31,6 +31,7 @@ Data path: data/words.json
 
 - Select a word in Chrome, right-click it, and choose **Save to Dana's Word Bank**.
 - In browser-based books, select a word and press **Command+Shift+S** on Mac or **Ctrl+Shift+S** on Windows.
+- Open the web capture page from the popup when you want to add prose or fuller source details.
 - Use the popup for a quick manual save.
 - Use the options page to add book metadata or bulk upload a word list.
 

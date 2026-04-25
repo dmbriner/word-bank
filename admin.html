@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dana's Word Bank Capture</title>
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="apple-touch-icon" href="favicon.png" />
+    <link rel="manifest" href="admin.webmanifest" />
+    <meta name="theme-color" content="#241f1a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Word Capture" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Libre+Baskerville:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body>
+    <main class="capture-shell">
+      <header class="capture-hero">
+        <nav class="topline" aria-label="Capture navigation">
+          <a href="index.html">Dictionary</a>
+          <button id="settings-toggle" class="text-button" type="button">Connection</button>
+        </nav>
+        <p class="kicker">Private capture</p>
+        <h1>Dana's Word Bank</h1>
+        <p class="hero-copy">Words, source notes, and strong phrasings.</p>
+      </header>
+
+      <section id="settings-panel" class="settings-panel" aria-labelledby="settings-title" hidden>
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">GitHub publisher</p>
+            <h2 id="settings-title">Connection</h2>
+          </div>
+          <button id="close-settings" class="text-button" type="button">Done</button>
+        </div>
+        <form id="settings-form" class="settings-grid">
+          <label class="wide-field">
+            Fine-grained token
+            <input id="token" type="password" autocomplete="off" placeholder="github_pat_..." />
+          </label>
+          <label>
+            Owner
+            <input id="owner" autocomplete="off" />
+          </label>
+          <label>
+            Repository
+            <input id="repo" autocomplete="off" />
+          </label>
+          <label>
+            Branch
+            <input id="branch" autocomplete="off" />
+          </label>
+          <label>
+            Words path
+            <input id="words-path" autocomplete="off" />
+          </label>
+          <label>
+            Prose path
+            <input id="prose-path" autocomplete="off" />
+          </label>
+          <div class="button-row wide-field">
+            <button class="primary-button" type="submit">Save Connection</button>
+            <button id="test-connection" class="ghost-button" type="button">Test</button>
+          </div>
+        </form>
+        <p id="settings-status" class="status-line" aria-live="polite"></p>
+      </section>
+
+      <section class="source-panel" aria-labelledby="source-title">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Source</p>
+            <h2 id="source-title">Where It Came From</h2>
+          </div>
+          <button id="clear-source" class="text-button" type="button">Clear</button>
+        </div>
+        <div class="source-grid">
+          <label class="wide-field">
+            Book or source
+            <input id="source-title-input" placeholder="Trillion Dollar Triage" autocomplete="off" />
+          </label>
+          <label>
+            Author
+            <input id="source-author" placeholder="Nick Timiraos" autocomplete="off" />
+          </label>
+          <label>
+            Location
+            <input id="source-location" placeholder="page 42 or chapter 3" autocomplete="off" />
+          </label>
+          <label>
+            App
+            <input id="source-app" placeholder="Kindle, Apple Books, Chrome" autocomplete="off" />
+          </label>
+          <label>
+            Source URL
+            <input id="source-url" type="url" placeholder="https://..." autocomplete="off" />
+          </label>
+        </div>
+        <p id="source-preview" class="source-preview">Saved by Dana</p>
+      </section>
+
+      <section class="capture-panel" aria-label="Capture forms">
+        <div class="tabs" role="tablist" aria-label="Capture type">
+          <button id="word-tab" class="tab-button active" type="button" role="tab" aria-selected="true" aria-controls="word-form">
+            Word
+          </button>
+          <button id="prose-tab" class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="prose-form">
+            Prose
+          </button>
+        </div>
+
+        <form id="word-form" class="capture-form" role="tabpanel" aria-labelledby="word-tab">
+          <label>
+            Word
+            <input id="word" placeholder="obsequious" autocomplete="off" />
+          </label>
+          <button class="primary-button" type="submit">Publish Word</button>
+        </form>
+
+        <form id="prose-form" class="capture-form" role="tabpanel" aria-labelledby="prose-tab" hidden>
+          <label>
+            Favorite phrasing
+            <textarea id="prose-text" rows="7" placeholder="A perilous game of hot potato"></textarea>
+          </label>
+          <button class="primary-button" type="submit">Publish Prose</button>
+        </form>
+
+        <p id="publish-status" class="status-line" aria-live="polite"></p>
+      </section>
+
+      <section class="recent-panel" aria-labelledby="recent-title">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Recently published</p>
+            <h2 id="recent-title">Latest Saves</h2>
+          </div>
+          <button id="refresh-recent" class="text-button" type="button">Refresh</button>
+        </div>
+        <div id="recent-list" class="recent-list" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <script type="module" src="admin.js"></script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("/word-bank/sw.js");
+      }
+    </script>
+  </body>
+</html>

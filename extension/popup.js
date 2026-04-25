@@ -4,6 +4,7 @@ const form = document.querySelector("#word-form");
 const word = document.querySelector("#word");
 const sourceTitle = document.querySelector("#source-title");
 const status = document.querySelector("#status");
+const captureButton = document.querySelector("#open-capture");
 const optionsButton = document.querySelector("#open-options");
 
 form.addEventListener("submit", async (event) => {
@@ -24,6 +25,10 @@ form.addEventListener("submit", async (event) => {
 
 optionsButton.addEventListener("click", () => {
   chrome.runtime.openOptionsPage();
+});
+
+captureButton.addEventListener("click", () => {
+  window.open("https://dmbriner.github.io/word-bank/admin.html", "_blank", "noopener");
 });
 
 function capitalize(value) {

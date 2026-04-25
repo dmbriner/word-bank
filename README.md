@@ -9,3 +9,37 @@ https://dmbriner.github.io/word-bank/
 ```
 
 The site is plain HTML, CSS, and JavaScript, so GitHub Pages can serve it directly from the repository root.
+
+## Web Capture
+
+Use the private capture page from a browser or phone:
+
+```text
+https://dmbriner.github.io/word-bank/admin.html
+```
+
+Open **Connection** and use:
+
+```text
+Owner: dmbriner
+Repository: word-bank
+Branch: main
+Words path: data/words.json
+Prose path: data/prose.json
+```
+
+Paste a fine-grained GitHub token with repository contents read/write access for `dmbriner/word-bank`. The token is saved only in that browser. The page publishes words, favorite prose, and shared source metadata to the public site.
+
+## Private Chrome Extension
+
+Extension directory to select in Chrome:
+
+```text
+/Users/danabriner/Desktop/Projects/word-bank/extension
+```
+
+The extension uses the same GitHub data path as the web capture page. Paste the same token in the extension options if you want right-click and keyboard capture inside Chrome.
+
+## Optional Local Tools
+
+The older Mac helper scripts are still in `tools/`, but the web capture page is now the simpler path for everyday use.
