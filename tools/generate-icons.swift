@@ -47,13 +47,14 @@ func drawIcon(size: Int, output: URL) throws {
   NSGraphicsContext.current?.imageInterpolation = .high
 
   let full = NSRect(x: 0, y: 0, width: canvas, height: canvas)
-  let background = NSBezierPath(rect: full)
-  NSGradient(colors: [hex("241f1a"), hex("4b2b35"), hex("8b2f2d")])?.draw(in: background, angle: -38)
+  hex("4b2b35").setFill()
+  NSBezierPath(rect: full).fill()
 
-  hex("fbf8f1", alpha: 0.09).setFill()
-  NSBezierPath(ovalIn: rect(292, 42, 250, 250, scale)).fill()
-  hex("b87b2f", alpha: 0.16).setFill()
-  NSBezierPath(ovalIn: rect(-76, 320, 245, 245, scale)).fill()
+  hex("8b2f2d").setFill()
+  NSBezierPath(rect: rect(0, 0, 512, 136, scale)).fill()
+
+  hex("b87b2f").setFill()
+  NSBezierPath(rect: rect(0, 376, 92, 136, scale)).fill()
 
   drawBook(scale: scale)
   drawMonogram(scale: scale)
@@ -68,9 +69,6 @@ func drawIcon(size: Int, output: URL) throws {
 }
 
 func drawBook(scale: CGFloat) {
-  hex("130f0d", alpha: 0.24).setFill()
-  NSBezierPath(roundedRect: rect(103, 132, 306, 244, scale), xRadius: 38 * scale, yRadius: 38 * scale).fill()
-
   hex("fffaf0").setFill()
   NSBezierPath(roundedRect: rect(86, 148, 340, 238, scale), xRadius: 34 * scale, yRadius: 34 * scale).fill()
 
