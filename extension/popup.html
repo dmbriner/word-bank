@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dana's Word Bank</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main>
+      <p class="kicker">Dana's Word Bank</p>
+      <h1>Quick Save</h1>
+      <form id="word-form">
+        <label>
+          Word
+          <input id="word" placeholder="veracious" required />
+        </label>
+        <label>
+          Source
+          <input id="source-title" placeholder="Optional book or page title" />
+        </label>
+        <button type="submit">Publish Word</button>
+      </form>
+      <p id="status" class="status"></p>
+      <button id="open-options" class="ghost" type="button">Settings and Uploads</button>
+    </main>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

@@ -1,0 +1,84 @@
+:root {
+  --ink: #241f1a;
+  --muted: #6f675e;
+  --paper: #fbf8f1;
+  --line: #ded6c9;
+  --accent: #8b2f2d;
+  --green: #3e6655;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  width: 330px;
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+main {
+  display: grid;
+  gap: 13px;
+  padding: 18px;
+}
+
+.kicker {
+  margin: 0;
+  color: var(--accent);
+  font: 700 0.72rem Inter, system-ui, sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+form {
+  display: grid;
+  gap: 12px;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font: 700 0.82rem Inter, system-ui, sans-serif;
+}
+
+input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: #fffefa;
+  color: var(--ink);
+  padding: 10px 11px;
+  outline: none;
+}
+
+button {
+  min-height: 40px;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  background: var(--accent);
+  color: white;
+  cursor: pointer;
+  font: 800 0.9rem Inter, system-ui, sans-serif;
+}
+
+.ghost {
+  background: #fffefa;
+  color: var(--accent);
+}
+
+.status {
+  min-height: 18px;
+  margin: 0;
+  color: var(--green);
+  font: 700 0.82rem Inter, system-ui, sans-serif;
+}

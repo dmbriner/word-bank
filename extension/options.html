@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dana's Word Bank Capture</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <p class="kicker">Private publisher</p>
+        <h1>Dana's Word Bank Capture</h1>
+        <p>Save words from Chrome, manually add book sources, or import a list. The public website stays read-only.</p>
+      </section>
+
+      <section class="grid">
+        <form id="settings-form" class="panel">
+          <h2>GitHub Access</h2>
+          <label>
+            Fine-grained token
+            <input id="token" type="password" autocomplete="off" placeholder="github_pat_..." />
+          </label>
+          <div class="split">
+            <label>
+              Owner
+              <input id="owner" />
+            </label>
+            <label>
+              Repository
+              <input id="repo" />
+            </label>
+          </div>
+          <div class="split">
+            <label>
+              Branch
+              <input id="branch" />
+            </label>
+            <label>
+              Data path
+              <input id="data-path" />
+            </label>
+          </div>
+          <button type="submit">Save Settings</button>
+          <p id="settings-status" class="status"></p>
+        </form>
+
+        <form id="word-form" class="panel">
+          <h2>Add a Word</h2>
+          <label>
+            Word
+            <input id="word" placeholder="sacrosanct" required />
+          </label>
+          <div class="split">
+            <label>
+              Book or source
+              <input id="source-title" placeholder="More Money than God" />
+            </label>
+            <label>
+              Author
+              <input id="source-author" placeholder="Sebastian Mallaby" />
+            </label>
+          </div>
+          <div class="split">
+            <label>
+              Location
+              <input id="source-location" placeholder="chapter, page, highlight, etc." />
+            </label>
+            <label>
+              App
+              <input id="source-app" placeholder="Kindle, Apple Books, Chrome" />
+            </label>
+          </div>
+          <label>
+            Source URL
+            <input id="source-url" type="url" placeholder="https://..." />
+          </label>
+          <button type="submit">Publish Word</button>
+          <p id="word-status" class="status"></p>
+        </form>
+
+        <form id="import-form" class="panel wide">
+          <h2>Bulk Upload</h2>
+          <label>
+            Words
+            <textarea id="import-text" rows="8" placeholder="Paste one word per line, or paste JSON with a words array"></textarea>
+          </label>
+          <label class="drop-zone">
+            <input id="import-file" type="file" accept=".txt,.json,.csv" />
+            <span>Drop or choose a .txt, .csv, or .json word list</span>
+          </label>
+          <button type="submit">Publish Import</button>
+          <p id="import-status" class="status"></p>
+        </form>
+      </section>
+    </main>
+
+    <script type="module" src="options.js"></script>
+  </body>
+</html>

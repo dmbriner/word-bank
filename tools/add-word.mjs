@@ -103,15 +103,21 @@ function buildSource(parsed) {
   const title = parsed["source-title"] || parsed.title || "";
   const url = parsed["source-url"] || parsed.url || "";
   const app = parsed.app || "";
+  const author = parsed.author || "";
+  const location = parsed.location || "";
+  const kind = parsed.kind || (author ? "book" : "");
 
-  if (!title && !url && !app) {
+  if (!title && !url && !app && !author && !location) {
     return null;
   }
 
   return {
+    kind,
     title,
+    author,
     url,
     app,
+    location,
     savedAt: new Date().toISOString(),
   };
 }
@@ -121,6 +127,13 @@ function addSource(sources, source) {
     return sources;
   }
 
-  const alreadySaved = sources.some((item) => item.title === source.title && item.url === source.url && item.app === source.app);
+  const alreadySaved = sources.some(
+    (item) =>
+      item.title === source.title &&
+      item.author === source.author &&
+      item.url === source.url &&
+      item.app === source.app &&
+      item.location === source.location,
+  );
   return alreadySaved ? sources : [...sources, source];
 }

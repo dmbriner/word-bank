@@ -96,9 +96,8 @@ function sourceNodes(sources) {
 
   return sources.flatMap((source, index) => {
     const separator = index ? [document.createElement("br")] : [];
-    const label = source.title || source.app || source.url || "Captured source";
-    const node = source.url ? document.createElement("a") : document.createElement("span");
-    node.textContent = `Saved from: ${label}`;
+    const node = source.url && source.kind !== "book" ? document.createElement("a") : document.createElement("span");
+    node.append(...sourceLabelNodes(source));
 
     if (source.url) {
       node.href = source.url;
@@ -109,6 +108,47 @@ function sourceNodes(sources) {
 
     return [...separator, node];
   });
+}
+
+function sourceLabelNodes(source) {
+  const nodes = [document.createTextNode("Saved from: ")];
+
+  if (source.kind === "book" && source.title) {
+    if (source.author) {
+      nodes.push(document.createTextNode(`${formatChicagoAuthor(source.author)}. `));
+    }
+
+    const title = document.createElement("em");
+    title.textContent = source.title;
+    nodes.push(title);
+
+    if (source.location) {
+      nodes.push(document.createTextNode(`, ${source.location}`));
+    }
+
+    if (source.app) {
+      nodes.push(document.createTextNode(` (${source.app})`));
+    }
+
+    return nodes;
+  }
+
+  nodes.push(document.createTextNode(source.title || source.app || source.url || "Captured source"));
+  return nodes;
+}
+
+function formatChicagoAuthor(author) {
+  if (!author || author.includes(",") || author.includes("&")) {
+    return author;
+  }
+
+  const parts = author.trim().split(/\s+/);
+  if (parts.length < 2) {
+    return author;
+  }
+
+  const last = parts.pop();
+  return `${last}, ${parts.join(" ")}`;
 }
 
 function emptyState(message) {
