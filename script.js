@@ -1,21 +1,18 @@
 const wordForm = document.querySelector("#word-form");
-const proseForm = document.querySelector("#prose-form");
+const wordInput = document.querySelector("#word");
 const wordList = document.querySelector("#word-list");
-const proseList = document.querySelector("#prose-list");
 const searchInput = document.querySelector("#search-input");
 const filterButtons = document.querySelectorAll(".filter-button");
 const clearWordsButton = document.querySelector("#clear-words");
-const lookupDefinitionButton = document.querySelector("#lookup-definition");
 const wordCount = document.querySelector("#word-count");
-const proseCount = document.querySelector("#prose-count");
-
+const sourceCount = document.querySelector("#source-count");
+const saveStatus = document.querySelector("#save-status");
 const wordTemplate = document.querySelector("#word-card-template");
-const proseTemplate = document.querySelector("#prose-card-template");
 
-const storageKeys = {
-  words: "word-bank.words",
-  prose: "word-bank.prose",
-};
+const storageKey = "word-bank.words";
+const legacyProseKey = "word-bank.prose";
+let activeFilter = "all";
+let pendingSource = readCaptureSource();
 
 const sampleWords = [
   {
@@ -23,12 +20,8 @@ const sampleWords = [
     word: "ingratiating",
     partOfSpeech: "adjective",
     definition: "Intended to gain approval or favor; sycophantic.",
-    context: "Useful for describing calculated charm, flattery, or approval-seeking behavior.",
-    bookTitle: "",
-    author: "",
-    publisher: "",
-    year: "",
-    learnedAt: "Unchy Words list",
+    example: "",
+    sources: [],
     createdAt: Date.now(),
   },
   {
@@ -36,92 +29,150 @@ const sampleWords = [
     word: "obsequious",
     partOfSpeech: "adjective",
     definition: "Obedient or attentive to an excessive or servile degree.",
-    context: "Useful when describing deference that feels strategic, exaggerated, or humiliating.",
-    bookTitle: "",
-    author: "",
-    publisher: "",
-    year: "",
-    learnedAt: "Unchy Words list",
+    example: "",
+    sources: [],
     createdAt: Date.now() - 1,
   },
 ];
 
-let words = load(storageKeys.words, sampleWords);
-let prose = load(storageKeys.prose, [
-  {
-    id: crypto.randomUUID(),
-    text: "The sentence lands with pressure because every ordinary object suddenly feels charged with private weather.",
-    bookTitle: "Notebook",
-    author: "Personal observation",
-    publisher: "",
-    year: "",
-    note: "A model for writing about prose without flattening it.",
-    createdAt: Date.now(),
-  },
-]);
-let activeFilter = "all";
+let words = loadWords();
 
-function load(key, fallback) {
-  const stored = localStorage.getItem(key);
-  return stored ? JSON.parse(stored) : fallback;
+function loadWords() {
+  const stored = localStorage.getItem(storageKey);
+  if (!stored) {
+    return sampleWords;
+  }
+
+  return JSON.parse(stored).map((entry) => ({
+    ...entry,
+    example: entry.example || "",
+    sources: normalizeSources(entry),
+    partOfSpeech: normalizePartOfSpeech(entry.partOfSpeech),
+  }));
+}
+
+function normalizeSources(entry) {
+  if (Array.isArray(entry.sources)) {
+    return entry.sources;
+  }
+
+  const legacyTitle = entry.bookTitle || entry.learnedAt || "";
+  if (!legacyTitle) {
+    return [];
+  }
+
+  return [
+    {
+      title: legacyTitle,
+      url: "",
+      app: "",
+      savedAt: entry.createdAt || Date.now(),
+    },
+  ];
 }
 
 function save() {
-  localStorage.setItem(storageKeys.words, JSON.stringify(words));
-  localStorage.setItem(storageKeys.prose, JSON.stringify(prose));
+  localStorage.setItem(storageKey, JSON.stringify(words));
+  localStorage.removeItem(legacyProseKey);
 }
 
-function chicagoBook(title, author, publisher = "", year = "") {
-  const cleanTitle = title.trim();
-  const cleanAuthor = chicagoAuthor(author.trim());
-  const cleanPublisher = publisher.trim();
-  const cleanYear = year.trim();
+function readCaptureSource() {
+  const params = new URLSearchParams(window.location.search);
+  const source = {
+    title: params.get("sourceTitle") || params.get("title") || "",
+    url: params.get("sourceUrl") || params.get("url") || "",
+    app: params.get("app") || "",
+    savedAt: Date.now(),
+  };
 
-  if (!cleanTitle && !cleanAuthor) {
-    return "";
-  }
-
-  if (!cleanTitle) {
-    return cleanAuthor;
-  }
-
-  if (!cleanAuthor) {
-    return citationDetails(`<em>${escapeHtml(cleanTitle)}</em>`, cleanPublisher, cleanYear);
-  }
-
-  return citationDetails(`${escapeHtml(cleanAuthor)}. <em>${escapeHtml(cleanTitle)}</em>`, cleanPublisher, cleanYear);
+  return source.title || source.url || source.app ? source : null;
 }
 
-function chicagoAuthor(author) {
-  if (!author || author.includes(",") || author.includes("&")) {
-    return author;
-  }
-
-  const parts = author.split(/\s+/);
-  if (parts.length < 2 || author.toLowerCase().includes("observation")) {
-    return author;
-  }
-
-  const last = parts.pop();
-  return `${last}, ${parts.join(" ")}`;
+function readCapturedWord() {
+  const params = new URLSearchParams(window.location.search);
+  return cleanWord(params.get("word") || params.get("text") || params.get("selection") || "");
 }
 
-function citationDetails(base, publisher, year) {
-  const details = [publisher, year].filter(Boolean).map(escapeHtml).join(", ");
-  return details ? `${base}. ${details}.` : `${base}.`;
+function cleanWord(value) {
+  return value
+    .trim()
+    .replace(/^[^\w'-]+|[^\w'-]+$/g, "")
+    .replace(/\s+/g, " ");
 }
 
-function escapeHtml(value) {
-  return value.replace(/[&<>"']/g, (char) => {
-    const entities = {
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#039;",
+async function lookupWord(word) {
+  try {
+    const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
+    if (!response.ok) {
+      throw new Error("No definition found");
+    }
+
+    const [entry] = await response.json();
+    const meaning = entry.meanings?.find((item) => item.definitions?.[0]?.definition) || entry.meanings?.[0];
+    const definition = meaning?.definitions?.[0]?.definition || "Definition not found automatically.";
+    const example = meaning?.definitions?.[0]?.example || "";
+
+    return {
+      partOfSpeech: normalizePartOfSpeech(meaning?.partOfSpeech),
+      definition,
+      example,
     };
-    return entities[char];
-  });
+  } catch (error) {
+    return {
+      partOfSpeech: "other",
+      definition: "Definition not found automatically.",
+      example: "",
+    };
+  }
+}
+
+function normalizePartOfSpeech(partOfSpeech) {
+  return ["noun", "verb", "adjective", "adverb"].includes(partOfSpeech) ? partOfSpeech : "other";
+}
+
+async function saveWord(rawWord, source = null) {
+  const word = cleanWord(rawWord);
+  if (!word) {
+    return;
+  }
+
+  setStatus("Saving...");
+  const lookup = await lookupWord(word);
+  const existing = words.find((entry) => entry.word.toLowerCase() === word.toLowerCase());
+
+  if (existing) {
+    Object.assign(existing, {
+      ...lookup,
+      sources: addSource(existing.sources, source),
+      updatedAt: Date.now(),
+    });
+    setStatus(`Updated ${word}.`);
+  } else {
+    words.push({
+      id: crypto.randomUUID(),
+      word,
+      ...lookup,
+      sources: addSource([], source),
+      createdAt: Date.now(),
+    });
+    setStatus(`Saved ${word}.`);
+  }
+
+  save();
+  renderWords();
+}
+
+function addSource(sources, source) {
+  if (!source || (!source.title && !source.url && !source.app)) {
+    return sources;
+  }
+
+  const alreadySaved = sources.some((item) => item.title === source.title && item.url === source.url && item.app === source.app);
+  return alreadySaved ? sources : [...sources, source];
+}
+
+function setStatus(message) {
+  saveStatus.textContent = message;
 }
 
 function normalize(value) {
@@ -129,7 +180,15 @@ function normalize(value) {
 }
 
 function getSearchBlob(item) {
-  return Object.values(item).join(" ").toLowerCase();
+  return [
+    item.word,
+    item.partOfSpeech,
+    item.definition,
+    item.example,
+    ...item.sources.flatMap((source) => [source.title, source.url, source.app]),
+  ]
+    .join(" ")
+    .toLowerCase();
 }
 
 function sortedWords() {
@@ -142,9 +201,9 @@ function grammarLabel(partOfSpeech) {
     verb: "Verbs",
     adjective: "Adjectives",
     adverb: "Adverbs",
-    other: "Other Words",
+    other: "Other",
   };
-  return labels[partOfSpeech] || "Other Words";
+  return labels[partOfSpeech] || "Other";
 }
 
 function renderWords() {
@@ -158,7 +217,7 @@ function renderWords() {
   wordList.textContent = "";
 
   if (!visibleWords.length) {
-    wordList.append(emptyState("No words match this search yet. Add one from the form, then it will alphabetize itself."));
+    wordList.append(emptyState("No saved words match this search."));
     updateCounts();
     return;
   }
@@ -179,20 +238,7 @@ function renderWords() {
     const items = document.createElement("div");
     items.className = "grammar-items";
 
-    groupWords.forEach((entry) => {
-      const card = wordTemplate.content.firstElementChild.cloneNode(true);
-      card.querySelector("h3").textContent = entry.word;
-      card.querySelector(".part").textContent = entry.partOfSpeech;
-      card.querySelector(".definition").textContent = entry.definition;
-      card.querySelector(".context").textContent = entry.context ? `Essay use: ${entry.context}` : "";
-
-      const citation = chicagoBook(entry.bookTitle || "", entry.author || "", entry.publisher || "", entry.year || "");
-      const learned = entry.learnedAt ? `Learned at: ${escapeHtml(entry.learnedAt)}` : "";
-      card.querySelector("footer").innerHTML = [citation, learned].filter(Boolean).join("<br>");
-      card.querySelector(".delete-word").addEventListener("click", () => deleteWord(entry.id));
-      items.append(card);
-    });
-
+    groupWords.forEach((entry) => items.append(wordCard(entry)));
     group.append(heading, items);
     wordList.append(group);
   });
@@ -200,35 +246,37 @@ function renderWords() {
   updateCounts();
 }
 
-function renderProse() {
-  const query = normalize(searchInput.value);
-  const visibleProse = prose
-    .filter((entry) => !query || getSearchBlob(entry).includes(query))
-    .sort((a, b) => b.createdAt - a.createdAt);
+function wordCard(entry) {
+  const card = wordTemplate.content.firstElementChild.cloneNode(true);
+  card.querySelector("h3").textContent = entry.word;
+  card.querySelector(".part").textContent = entry.partOfSpeech;
+  card.querySelector(".definition").textContent = entry.definition;
+  card.querySelector(".example").textContent = entry.example ? `Example: ${entry.example}` : "";
+  card.querySelector("footer").replaceChildren(...sourceNodes(entry.sources));
+  card.querySelector(".delete-word").addEventListener("click", () => deleteWord(entry.id));
+  return card;
+}
 
-  proseList.textContent = "";
-
-  if (!visibleProse.length) {
-    proseList.append(emptyState("No prose notes match this search yet."));
-    updateCounts();
-    return;
+function sourceNodes(sources) {
+  if (!sources.length) {
+    return [document.createTextNode("Saved manually")];
   }
 
-  visibleProse.forEach((entry) => {
-    const card = proseTemplate.content.firstElementChild.cloneNode(true);
-    card.querySelector("blockquote").textContent = entry.text;
-    card.querySelector(".prose-note").textContent = entry.note || "";
-    card.querySelector("footer").innerHTML = chicagoBook(
-      entry.bookTitle || "",
-      entry.author || "",
-      entry.publisher || "",
-      entry.year || "",
-    );
-    card.querySelector(".delete-prose").addEventListener("click", () => deleteProse(entry.id));
-    proseList.append(card);
-  });
+  return sources.flatMap((source, index) => {
+    const separator = index ? [document.createElement("br")] : [];
+    const label = source.title || source.app || source.url || "Captured source";
+    const node = source.url ? document.createElement("a") : document.createElement("span");
+    node.textContent = `Saved from: ${label}`;
 
-  updateCounts();
+    if (source.url) {
+      node.href = source.url;
+      node.target = "_blank";
+      node.rel = "noreferrer";
+      node.className = "source-link";
+    }
+
+    return [...separator, node];
+  });
 }
 
 function emptyState(message) {
@@ -240,7 +288,7 @@ function emptyState(message) {
 
 function updateCounts() {
   wordCount.textContent = words.length;
-  proseCount.textContent = prose.length;
+  sourceCount.textContent = new Set(words.flatMap((entry) => entry.sources.map((source) => source.title || source.url || source.app))).size;
 }
 
 function deleteWord(id) {
@@ -249,99 +297,11 @@ function deleteWord(id) {
   renderWords();
 }
 
-function deleteProse(id) {
-  prose = prose.filter((entry) => entry.id !== id);
-  save();
-  renderProse();
-}
-
-async function fillDefinition() {
-  const wordInput = document.querySelector("#word");
-  const definitionInput = document.querySelector("#definition");
-  const partOfSpeechInput = document.querySelector("#part-of-speech");
-  const word = wordInput.value.trim();
-
-  if (!word) {
-    wordInput.focus();
-    return false;
-  }
-
-  lookupDefinitionButton.textContent = "Filling...";
-  lookupDefinitionButton.disabled = true;
-
-  try {
-    const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
-    if (!response.ok) {
-      throw new Error("No definition found");
-    }
-
-    const [entry] = await response.json();
-    const meaning = entry.meanings?.[0];
-    const definition = meaning?.definitions?.[0]?.definition;
-    const part = meaning?.partOfSpeech;
-
-    if (definition && !definitionInput.value.trim()) {
-      definitionInput.value = definition;
-    }
-
-    if (part && ["noun", "verb", "adjective", "adverb"].includes(part)) {
-      partOfSpeechInput.value = part;
-    }
-
-    return Boolean(definition);
-  } catch (error) {
-    return false;
-  } finally {
-    lookupDefinitionButton.textContent = "Fill Definition";
-    lookupDefinitionButton.disabled = false;
-  }
-}
-
 wordForm.addEventListener("submit", async (event) => {
   event.preventDefault();
-  const definitionInput = document.querySelector("#definition");
-  if (!definitionInput.value.trim()) {
-    await fillDefinition();
-  }
-
-  const data = new FormData(wordForm);
-
-  words.push({
-    id: crypto.randomUUID(),
-    word: data.get("word").trim(),
-    partOfSpeech: data.get("partOfSpeech"),
-    definition: data.get("definition").trim(),
-    context: data.get("context").trim(),
-    bookTitle: data.get("bookTitle").trim(),
-    author: data.get("author").trim(),
-    publisher: data.get("publisher").trim(),
-    year: data.get("year").trim(),
-    learnedAt: data.get("learnedAt").trim(),
-    createdAt: Date.now(),
-  });
-
+  await saveWord(wordInput.value, pendingSource);
+  pendingSource = null;
   wordForm.reset();
-  save();
-  renderWords();
-});
-
-proseForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-
-  prose.push({
-    id: crypto.randomUUID(),
-    text: document.querySelector("#prose-text").value.trim(),
-    bookTitle: document.querySelector("#prose-book-title").value.trim(),
-    author: document.querySelector("#prose-author").value.trim(),
-    publisher: document.querySelector("#prose-publisher").value.trim(),
-    year: document.querySelector("#prose-year").value.trim(),
-    note: document.querySelector("#prose-note").value.trim(),
-    createdAt: Date.now(),
-  });
-
-  proseForm.reset();
-  save();
-  renderProse();
 });
 
 filterButtons.forEach((button) => {
@@ -353,20 +313,26 @@ filterButtons.forEach((button) => {
   });
 });
 
-searchInput.addEventListener("input", () => {
-  renderWords();
-  renderProse();
-});
+searchInput.addEventListener("input", renderWords);
 
 clearWordsButton.addEventListener("click", () => {
   words = [];
-  prose = [];
   save();
   renderWords();
-  renderProse();
+  setStatus("");
 });
 
-lookupDefinitionButton.addEventListener("click", fillDefinition);
+async function saveCapturedWord() {
+  const capturedWord = readCapturedWord();
+  if (!capturedWord) {
+    return;
+  }
+
+  wordInput.value = capturedWord;
+  await saveWord(capturedWord, pendingSource);
+  pendingSource = null;
+  window.history.replaceState({}, document.title, window.location.pathname);
+}
 
 renderWords();
-renderProse();
+saveCapturedWord();
