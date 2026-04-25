@@ -207,20 +207,15 @@ textarea:focus {
   color: var(--muted);
 }
 
-.lookup-button {
-  width: max-content;
-}
-
 .workspace {
   display: grid;
-  grid-template-columns: 380px minmax(0, 1fr);
+  grid-template-columns: 320px minmax(0, 1fr);
   gap: 20px;
   align-items: start;
 }
 
 .entry-panel,
-.library-panel,
-.prose-section {
+.library-panel {
   background: rgba(255, 253, 248, 0.9);
   border: 1px solid rgba(36, 31, 26, 0.15);
   box-shadow: var(--shadow);
@@ -236,10 +231,12 @@ form {
   gap: 15px;
 }
 
-.source-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+.save-status {
+  min-height: 22px;
+  margin: 14px 0 0;
+  color: var(--green);
+  font-size: 0.9rem;
+  font-weight: 700;
 }
 
 .panel-heading {
@@ -276,8 +273,7 @@ form {
   gap: 14px;
 }
 
-.word-card,
-.prose-card {
+.word-card {
   position: relative;
   border: 1px solid var(--line);
   border-radius: 6px;
@@ -290,12 +286,6 @@ form {
   align-items: start;
   justify-content: space-between;
   gap: 10px;
-}
-
-.prose-actions {
-  position: absolute;
-  top: 14px;
-  right: 14px;
 }
 
 .part {
@@ -312,7 +302,7 @@ form {
   line-height: 1.65;
 }
 
-.context {
+.example {
   margin: 14px 0 0;
   color: var(--accent-dark);
   font-size: 0.93rem;
@@ -338,30 +328,10 @@ footer {
   font-size: 1.35rem;
 }
 
-.prose-section {
-  display: grid;
-  grid-template-columns: 380px minmax(0, 1fr);
-  gap: 20px;
-  margin-top: 20px;
-  padding: 22px;
-}
-
-.prose-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 14px;
-}
-
-blockquote {
-  margin: 0;
-  padding-right: 28px;
-  font-size: 1.05rem;
-  line-height: 1.8;
-}
-
-.prose-note {
-  margin: 14px 0 0;
-  color: var(--accent-dark);
+.source-link {
+  color: var(--muted);
+  text-decoration-color: rgba(111, 103, 94, 0.4);
+  text-underline-offset: 3px;
 }
 
 .empty-state {
@@ -376,8 +346,7 @@ blockquote {
 @media (max-width: 860px) {
   .hero,
   .controls,
-  .workspace,
-  .prose-section {
+  .workspace {
     grid-template-columns: 1fr;
   }
 
@@ -401,13 +370,8 @@ blockquote {
     padding-top: 32px;
   }
 
-  .source-grid {
-    grid-template-columns: 1fr;
-  }
-
   .entry-panel,
-  .library-panel,
-  .prose-section {
+  .library-panel {
     padding: 16px;
   }
 }
