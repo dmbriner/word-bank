@@ -99,6 +99,26 @@
       "createdAt": "2026-04-25T19:28:02.687Z"
     },
     {
+      "id": "stodgy",
+      "word": "Stodgy",
+      "partOfSpeech": "adjective",
+      "definition": "(of food) Having a thick, semi-solid consistency; glutinous; heavy on the stomach.",
+      "example": "",
+      "essayContext": "Useful when describing a person, argument, institution, or tone as (of food) having a thick, semi-solid consistency; glutinous; heavy on the stomach.",
+      "sources": [
+        {
+          "kind": "book",
+          "title": "More Money Than God",
+          "author": "Sebastian Mallaby",
+          "location": "",
+          "app": "",
+          "url": "http://books.google.com/books?id=SuAkejQbpdIC&dq=intitle:%22More+money+than+god%22&hl=&as_pt=BOOKS&source=gbs_api",
+          "savedAt": "2026-04-29T19:33:27.373Z"
+        }
+      ],
+      "createdAt": "2026-04-29T19:33:27.373Z"
+    },
+    {
       "id": "stymied",
       "word": "Stymied",
       "partOfSpeech": "verb",
