@@ -41,6 +41,26 @@
       "createdAt": "2026-04-27T17:11:49.508Z"
     },
     {
+      "id": "chartism",
+      "word": "Chartism",
+      "partOfSpeech": "noun",
+      "definition": "The practices and methodologies of chartists.",
+      "example": "",
+      "essayContext": "Useful when naming an abstract force, condition, or idea connected to the practices and methodologies of chartists.",
+      "sources": [
+        {
+          "kind": "book",
+          "title": "More Money Than God",
+          "author": "Sebastian Mallaby",
+          "location": "",
+          "app": "",
+          "url": "http://books.google.com/books?id=SuAkejQbpdIC&dq=intitle:%22More+money+than+god%22&hl=&as_pt=BOOKS&source=gbs_api",
+          "savedAt": "2026-05-01T15:00:36.563Z"
+        }
+      ],
+      "createdAt": "2026-05-01T15:00:36.563Z"
+    },
+    {
       "id": "clandestine",
       "word": "Clandestine",
       "partOfSpeech": "adjective",
